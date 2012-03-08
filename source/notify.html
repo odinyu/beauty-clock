@@ -1,0 +1,138 @@
+﻿<html>
+	<head>
+		<style>
+			table {font-family:Helvetica, Arial, sans-serif;font-size:13px;}
+			table td {vertical-align:top;}
+			#msg {width:230px;padding-bottom:10px;}
+			#msg span {color:red;}
+			#icon {width:60px;margin:2px 10px 0 0;}
+			a {color:#858586;line-height:14px;text-decoration: underline;}
+		</style>
+	<script src="js/jquery.js"></script>
+	<script>
+	var bg = chrome.extension.getBackgroundPage();
+	var notify_pic_url;
+	$(document).ready(function(){
+		$('#msga').click(function(){
+			var msg = bg.getBeSet();
+			//$('#msga').html(msg);
+			notify_pic_url = ajaxGetUrl(msg);
+			//$('#msga').html(extdata);
+			if(notify_pic_url==null || notify_pic_url==''){
+				notify_pic_url = bg.getUrl();
+			}
+			$('#msga').html(notify_pic_url);
+			//$('#msga').html('将为您在新标签页打开'+msg);
+			setTimeout(showPic, 5000);
+		});
+	});
+	
+	function showPic(){
+		//$('#msga').html(extdata);
+		openTab(notify_pic_url);
+		var notification = bg.getNotification();
+		notification.cancel();
+		bg.resetNotified();
+	}
+	
+	function ajaxGetUrl(msg){
+		if(msg=='世嘉美女'){
+			$.getJSON("http://24c-quatre.niaoke.com/x/getphoto.php",
+			function(data){
+				var xx = data["data"];
+				var yy = xx[0];
+				var murl = 'http://24c-quatre.niaoke.com'+yy.photo;
+				return murl;
+			});
+		}
+		else if(msg=='凤凰美女'){
+			var h = hm.substr(0,2);
+			var m = hm.substr(2,3);
+			var _time = h+':'+m;
+			$.ajax({url:"http://app.fashion.ifeng.com/clock/slide.php?time="+_time,dataType:'html',cache:false,success:function(html){
+				var s = html.substring(html.indexOf('res.fa')-7,html.indexOf('"590')-8);
+				$('#nn').width(590);
+				$('#mm').attr('src',s).show();
+				$('#ttt').click(function(){openTab(s);});
+			}
+			});
+		}
+		else if(msg=='车展美女'){
+			$.getJSON("http://2010.niaoke.com/x/getphoto.php",
+			function(data){
+				var xx = data["data"];
+				var yy = xx[0];
+				var murl = 'http://2010.niaoke.com'+yy.photo;
+				return murl;
+			});
+		}
+		else if(msg=='鸟客美女'){
+			$.ajax({url:'http://24.niaoke.com/index1.php',dataType:'html',cache:false,success:function(html){
+				var s = html.substring(html.indexOf('"photo"')+9,html.indexOf('"up_num"')-2);
+				s = 'http://24.niaoke.com'+s;
+				return s;
+			}
+			});
+		}
+		else if(msg=='天涯美女'){
+			$.ajax({url:'http://24.niaoke.com/tianya/',dataType:'html',cache:false,success:function(html){
+				var s = html.substring(html.indexOf('"photo"')+9,html.indexOf('"up_num"')-2);
+				s = 'http://24.niaoke.com'+s;
+				return s;
+			}
+			});
+		}
+		else if(msg=='苏州美女'){
+			$.getJSON("http://bbs.szr.com/clock.php",
+			function(data){
+				var murl = 'http://bbs.szr.com/'+data["img"];
+				return murl;
+			});
+		}
+		else if(msg=='搜道美女'){
+			$.getJSON("http://www.sodao.com/showtime/gt",
+			function(data){
+				var x = data[0];
+				var murl = x.path;
+				return murl;
+			});
+		}
+		else if(msg=='合肥美女'){
+			$.getJSON("http://www.sodao.com/showtime/gt?pcs_id=8",
+			function(data){
+				var x = data[0];
+				var murl = x.path;
+				return murl;
+			});
+		}
+		else if(msg=='青岛美女'){
+			$.getJSON("http://www.sodao.com/showtime/gt?pcs_id=9",
+			function(data){
+				var x = data[0];
+				var murl = x.path;
+				return murl;
+			});
+		}
+		else if(msg=='韩国美女2'){
+			$.ajax({url:'http://www.talkon.co.kr/www/include/left_main_img.php',dataType:'html',cache:false,success:function(html){
+				var s = html.substring(html.indexOf('img src')+9,html.indexOf('width=')-2);
+				return s;
+			}
+			});
+		}
+	}
+		
+	function openTab(u){
+	  chrome.tabs.create({url: u});
+    }
+	</script>
+	<head>
+	<body>
+		<table>
+			<tr>
+				<td id="icon"><img src="icon/icon48.png" width="48" height="48"/></td>
+				<td id="msg">美女为您整点报时：<span></span><br/><br/><a id="msga" style="cursor:pointer;">当前美女</a></td>
+			</tr>
+		</table>
+	</body>
+</html>

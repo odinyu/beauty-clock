@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+<title>美女时钟</title>
+
+<script type="text/javascript" src="js/jquery-latest.pack.js"></script>
+<script type="text/javascript" src="js/pluginpage.js"></script>
+<script type="text/javascript" src="js/jquery.pngFix.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    $(document).pngFix();
+}); 
+
+var xmlHttp = false;
+//获取服务器时间
+try {
+xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
+} catch (e) {
+try {
+    xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+} catch (e2) {
+    xmlHttp = false;
+}
+}
+
+if (!xmlHttp && typeof XMLHttpRequest != 'undefined') {
+xmlHttp = new XMLHttpRequest();
+}
+
+xmlHttp.open("GET", "null.txt", false);
+xmlHttp.setRequestHeader("Range", "bytes=-1");
+xmlHttp.send(null);
+
+severtime=new Date(xmlHttp.getResponseHeader("Date"));
+
+//获取服务器日期
+var year=severtime.getFullYear();
+var month=severtime.getMonth()+1;
+var date=severtime.getDate();
+//获取服务器时间
+var hour=severtime.getHours();
+var minu=severtime.getMinutes();
+var seco=severtime.getSeconds();
+//获取客户端时间
+localtime=new Date();
+//取得时间差
+var jtime=Math.abs(localtime.getTime()-severtime.getTime());
+var jdate=jtime/(24*60*60*1000);
+var jhour=jtime%(24*60*60*1000)/(60*60*1000);
+var jminu=jtime%(24*60*60*1000)%(60*60*1000)/(60*1000);
+var jsecond=jtime%(24*60*60*1000)%(60*60*1000)%(60*1000)/1000;
+
+//格式化输出客户端时间
+oldminute=0;
+oldhour=0;
+var js=0;
+var type=Math.ceil(Math.random()*3);
+function getClientTime(){
+localtime=new Date();
+var cyear=localtime.getFullYear();
+var cmonth=localtime.getMonth()+1;
+var cdate=localtime.getDate();
+var chour=localtime.getHours();
+var cminu=localtime.getMinutes();
+var cseco=localtime.getSeconds();
+
+ccyear=addZero(cyear);
+ccmonth=addZero(cmonth);
+ccdate=addZero(cdate);
+cchour=addZero(chour);
+ccminu=addZero(cminu);
+ccseco=addZero(cseco);
+
+ if(oldminute!=ccminu||cchour!=oldhour)
+{
+             
+             js=js+1;
+             if(js==3)
+             {
+               js=1;
+               type = Math.ceil(Math.random()*3); 
+             }
+  
+             var girl=new Array();
+             $.ajax({
+		     type: "POST",
+		     url: "dopic.php",
+		     dataType: 'json',
+             data:  "hour="+cchour+"&minute="+ccminu+"&type="+type,
+		     success: function(response){ 
+               
+               $("#apDiv1_main").attr("style","display:none");
+               $("#apDiv3_main").attr("style","display:none");
+               $("#apDiv4_main").attr("style","display:none");
+                
+                $("#mphoto").fadeOut(1500,function(){$(this).attr("src","http://voteimage1.9you.com/img/pp/clock/image/girl/"+type+"/"+cchour+ccminu+".jpg").fadeIn(1500)});
+                
+               if(response.glocation!="no")
+               {
+               
+                $("#apDiv"+response.glocation+"_main").attr("style","");
+                $("#ap"+response.glocation).fadeOut(1500,function(){$(this).attr("src","http://voteimage1.9you.com/img/pp/clock/image/gg/"+type+"/"+response.gphoto).fadeIn(1500)});
+                $("#a"+response.glocation).attr("href",response.address);
+               }
+               $("#realname").attr("innerHTML",response.realname);
+               $("#birthday").attr("innerHTML",response.birthday);
+               $("#blood").attr("innerHTML",response.blood);
+               $("#three").attr("innerHTML",response.three);
+               $("#city").attr("innerHTML",response.city);
+               $("#job").attr("innerHTML",response.job);
+               $("#interest").attr("innerHTML",response.interest);
+               $("#game").attr("innerHTML",response.game);
+               $("#signname").attr("innerHTML",response.signname);
+               } 
+		});	
+        if(ccminu==59)
+        {
+          nextminu="00";
+          if(cchour==23)
+          {
+            nextcchour="00";
+          }else
+          {
+            nextcchour=cchour+1;
+          }
+           
+        }else
+        {
+            nextminu=ccminu+1;
+            nextcchour=cchour;
+        }
+        
+        var next_url="http://voteimage1.9you.com/img/pp/clock/image/girl/"+type+"/"+nextcchour+nextminu+".jpg";
+     
+        loadImage(next_url);
+        oldminute=ccminu;
+        oldhour=cchour;
+}
+//var infoc="你的客户端时间：";
+//document.getElementById("clienttime").innerHTML=infoc+ccyear+"-"+ccmonth+"-"+ccdate+" "+cchour+":"+ccminu+":"+ccseco;
+}
+
+function loadImage(url) {
+    var img = new Image(); //创建一个Image对象，实现图片的预下载
+    img.src = url;
+    if (img.complete) { // 如果图片已经存在于浏览器缓存，直接调用回调函数
+        return true; // 直接返回，不用再处理onload事件
+    }
+
+    img.onload = function () {
+        return true;
+    };
+};
+
+//格式化输出服务器时间
+function getSeverTime(){
+seco++;
+if(seco==60){
+minu+=1;
+seco=0;
+}
+if(minu==60){
+   hour+=1;
+   minu=0;
+}
+if(hour==24){ 
+date+=1;
+hour=0;
+}
+//日期处理
+if(month==1||month==3||month==5||month==7
+||month==8||month==10||month==12)
+{
+if(date==32)
+{
+   date=1;
+   month+=1;
+   }
+}else if(month==4||month==6||month==9||month==11){
+if(date==31){
+   date=1;
+   month+=1;
+   }
+}else if(month==2){
+   if(year%4==0&&year%100!=0){//闰年处理
+    if(date==29){
+     date=1;
+     month+=1;
+    }
+   }else{
+    if(date==28){
+     date=1;
+     month+=1;
+    }
+   }
+}
+if(month==13){
+year+=1;
+month=1;
+}
+sseco=addZero(seco);
+sminu=addZero(minu);
+shour=addZero(hour);
+sdate=addZero(date);
+smonth=addZero(month);
+syear=year;
+
+//innerdata="当前服务器时间：";
+//document.getElementById("servertime").innerHTML=innerdata+syear+"-"+smonth+"-"+sdate+" "+shour+":"+sminu+":"+sseco;
+setTimeout("getSeverTime()",1000);
+setTimeout("getClientTime()",100);
+}
+
+function addZero(num) {
+num=Math.floor(num);
+return ((num <= 9) ? ("0" + num) : num);
+}
+function MM_showHideLayers() { //v9.0
+  var i,p,v,obj,args=MM_showHideLayers.arguments;
+  for (i=0; i<(args.length-2); i+=3) 
+  with (document) if (getElementById && ((obj=getElementById(args[i]))!=null)) { v=args[i+2];
+    if (obj.style) { obj=obj.style; v=(v=='show')?'visible':(v=='hide')?'hidden':v; }
+    obj.visibility=v; }
+}
+</script>
+
+<link href="css/v1.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+body {
+	margin: 0px;
+	padding: 0px;
+}
+</style>
+</head>
+<body onload="getSeverTime();">
+<div id="clock_main_inner_nr">
+  <div id="clock_main_inner_photo">
+    <div id="apDiv2_main" class="sb"><img src="images/shuiying1.png" width="590" height="450" onmousemove="MM_showHideLayers('clock_main_right_box','','show','clock_main_right_box1','','hide')" onmouseout="MM_showHideLayers('clock_main_right_box','','hide','clock_main_right_box1','','show')" /></div>
+    <div id="apDiv1"><iframe src="http://www.9you.com/gg/clock/gg.html" width="186" marginwidth="0" height="99" marginheight="0" scrolling="no" frameborder="0" allowTransparency="true"></iframe></div>
+    <!-- 带程序的广告
+    <div id="apDiv1_main" style="display:none"><a href="#" target="_blank" id="a1"><img id="ap1" src="images/bg.jpg" width="186" height="99" border="0" /></a></div>
+    <div id="apDiv3_main" style="display:none"><a href="#" target="_blank" id="a3"><img id="ap3" src="images/bg.jpg" width="186" height="99" border="0" /></a></div>
+    <div id="apDiv4_main" style="display:none"><a href="#" target="_blank" id="a4"><img id="ap4" src="images/bg.jpg" width="186" height="99" border="0" /></a></div> -->
+    <img src="images/bg.jpg" id="mphoto" /></div>
+
+  <span id="servertime"></span>
+  <span id="clienttime"></span>
+  <span id="xctime"></span>
+  <div id="clock_main_right">
+    <div id="clock_main_right_box">
+      <div id="clock_main_right_point">
+        <div id="clock_main_right_zi" class="f12 red">美女信息</div>
+        <div id="clock_main_right_zi" class="f12 red h18">姓名　<span class="hui" id="realname">-</span><br />
+
+          生日　<span class="hui" id="birthday">-</span><br/>
+          血型　<span class="hui" id="blood">-</span><br/>
+          三围　<span class="hui" id="three">-</span><br />
+          所在城市　<span class="hui" id="city">-</span></div>
+        <div id="clock_main_right_point1"></div>
+
+        <div id="clock_main_right_zi1" class="f12 blue h18">职业<br />
+            <span class="hui" id="job">-</span>            </div>
+        <div id="clock_main_right_zi1" class="f12 blue h18">兴趣<br />
+            <span class="hui" id="interest">-<br/>
+          </span></div>
+        <div id="clock_main_right_zi1" class="f12 blue h18">最近玩的游戏<br />
+
+            <span class="hui" id="game">-</span></div>
+        <div id="clock_main_right_zi" class="f12 blue h18">个性签名<br />
+            <span class="hui" id="signname">-</span></div>
+      </div>
+    </div>
+    <div id="clock_main_right_box1"><a href="http://www.do93.com/" target="_blank"><img src="images/mina.jpg" width="260" height="450" border="0" /></a></div>
+  </div>
+
+  <div style="clear:both;"></div>
+</div>
+</body>
