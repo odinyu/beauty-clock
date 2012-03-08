@@ -1,0 +1,35 @@
+﻿<html>
+	<head>
+		<style>
+			table {font-family:Helvetica, Arial, sans-serif;font-size:13px;}
+			table td {vertical-align:top;}
+			#msg {width:230px;padding-bottom:10px;}
+			#msg span {color:red;}
+			#icon {width:60px;margin:2px 10px 0 0;}
+			a {color:#858586;line-height:14px;text-decoration: underline;}
+		</style>
+	<script src="js/jquery.js"></script>
+	<script>
+	$(document).ready(function(){
+		$.get('http://mm.jc168.com/ajax.asp',function(data){
+			alert(data);
+			var str = data.split("｜");
+			alert(str[2]);
+		});
+	});
+		
+	function openTab(u){
+	  chrome.tabs.create({url: u});
+    }
+	</script>
+	<head>
+	<body>
+		<table>
+			<tr>
+				<td id="icon"><img src="icon/icon48.png" width="48" height="48"/></td>
+				<td id="msg">美女为您整点报时：<span></span><br/><br/><a id="msga" style="cursor:pointer;">当前美女</a></td>
+			</tr>
+		</table>
+		<iframe src="http://mm.jc168.com/ajax.asp"></iframe>
+	</body>
+</html>
